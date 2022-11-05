@@ -143,7 +143,8 @@ const {
   total,
   limit,
   getData,
-  handleDelete
+  handleDelete,
+  handleStatusChange
 } = useInitTable({
   getList: getManagerList,
   onGetListSuccess:(res) => {
@@ -157,7 +158,8 @@ const {
   searchForm: {
     keyword: ''
   },
-  delete: deleteManager
+  delete: deleteManager,
+  updateStatus: updateManagerStatus
 })
 
 // 表单部分
@@ -183,13 +185,5 @@ const {
   update: updateManager
 })
 
-const handleStatusChange = (status, row) => {
-  row.statusLoading = true
-  updateManagerStatus(row.id, status)
-    .then(res => {
-      row.status = status
-    }).finally(() => {
-      row.statusLoading = false
-    })
-}
+
 </script>

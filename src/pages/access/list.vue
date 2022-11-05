@@ -17,11 +17,11 @@
           <span>{{data.name}}</span>
 
           <div class="ml-auto">
-            <el-switch v-model="data.status" :active-value="1" :inactive-value="0">
+            <el-switch v-model="data.status" :active-value="1" :inactive-value="0" @change="handleStatusChange($event, data)">
             </el-switch>
             <el-button text type="primary" size="small" @click.stop="handleEdit(data)">修改</el-button>
-            <el-button text type="primary" size="small">增加</el-button>
-            <el-button text type="primary" size="small">删除</el-button>
+            <el-button text type="primary" size="small" @click.stop="addChild(data.id)">增加</el-button>
+            <el-button text type="primary" size="small" @click="handleDelete(data.id)">删除</el-button>
           </div>
         </div>
       </template>
@@ -48,7 +48,7 @@
           <el-input v-model="form.name" style="width: 30%"></el-input>
         </el-form-item>
         <el-form-item label="菜单图标" v-if="form.menu == 1">
-          <el-input v-model="form.icon"></el-input>
+          <iconSelect v-model="form.icon"/>
         </el-form-item>
         <el-form-item label="前端路由" v-if="form.menu == 1 && form.rule_id > 0">
           <el-input v-model="form.frontpath"></el-input>
@@ -75,24 +75,29 @@
 
 <script setup>
 import listHeader from "~/components/listHeader.vue";
-import {getRuleList, createRule, updateRule} from '~/api/rule'
+import {getRuleList, createRule, updateRule,updateRuleStatus,deleteRule} from '~/api/rule'
 import {useInitTable, useInitForm} from '~/composables/useCommon'
 import { ref } from "vue";
 import formDrawer from '~/components/formDrawer.vue'
+import iconSelect from '~/components/iconSelect.vue'
 
 let defaultCheckedKeys = ref([])
 const options = ref([])
 const {
   loading,
   tableData,
-  getData
+  getData,
+  handleDelete,
+  handleStatusChange
 } = useInitTable({
   getList: getRuleList,
   onGetListSuccess: res => {
     options.value = res.rules
     tableData.value = res.list
     defaultCheckedKeys.value = res.list.map(o => o.id)
-  }
+  },
+  delete: deleteRule,
+  updateStatus: updateRuleStatus
 })
 
 // 表单部分
@@ -121,6 +126,12 @@ const {
   create: createRule,
   update: updateRule
 })
+
+const addChild = id => {
+  handleCreate()
+  form.rule_id = id
+  form.status = 1
+}
 </script>
 
 <style scoped lang="scss">

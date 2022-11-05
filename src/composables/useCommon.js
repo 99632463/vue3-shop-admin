@@ -61,6 +61,36 @@ export const useInitTable = (opt) => {
       });
   };
 
+  const handleStatusChange = (status, row) => {
+    row.statusLoading = true
+    opt.updateStatus(row.id, status)
+      .then(res => {
+        row.status = status
+      }).finally(() => {
+        row.statusLoading = false
+      })
+  }
+
+  const mutiSelectionIds = ref([])
+  const handleSelectionChange = e => {
+    mutiSelectionIds.value = e.map(o => o.id)
+  }
+
+  const tableRef = ref(null)
+  const handleMultiDelete = () => {
+    loading.value = true
+    opt.delete(mutiSelectionIds.value)
+      .then(res => {
+        // clear selection
+        if(tableRef.value){
+          tableRef.value.clearSelection()
+        }
+        getData()
+      }).finally(() => {
+        loading.value = false
+      })
+  }
+
   return {
     searchForm,
     resetSearchForm,
@@ -70,7 +100,11 @@ export const useInitTable = (opt) => {
     total,
     limit,
     getData,
-    handleDelete
+    handleDelete,
+    handleStatusChange,
+    handleSelectionChange,
+    tableRef,
+    handleMultiDelete
   }
 }
 
