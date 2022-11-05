@@ -120,9 +120,16 @@ export const useInitForm = (opt) => {
   const handleSubmit = () => {
     formDrawerRef.value.setLoading(true);
 
+    let body = {}
+    if(opt.beforeSubmit && typeof opt.beforeSubmit === 'function'){
+      body = opt.beforeSubmit({...form})
+    } else {
+      body = form
+    }
+
     const func = editId.value
-      ? opt.update(editId.value, form)
-      : opt.create(form);
+      ? opt.update(editId.value, body)
+      : opt.create(body);
 
     func
       .then((res) => {
