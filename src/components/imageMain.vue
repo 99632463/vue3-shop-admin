@@ -56,13 +56,20 @@ function getData(p = null){
   })
 }
 
+const props = defineProps({
+  limit: {
+    type: Number,
+    default: 1
+  }
+})
+
 // 选中的图片
 const emit = defineEmits(['choose'])
 const checkedImage = computed(() => list.value.filter(o => o.checked))
 const handleChooseChange = (item) => {
-  if (item.checked && checkedImage.value.length > 1) {
+  if (item.checked && checkedImage.value.length > props.limit) {
     item.checked = false
-    alert('最多只能选中一张')
+    alert(`最多只能选中${props.limit}张`)
   }
   emit('choose', checkedImage.value)
 }

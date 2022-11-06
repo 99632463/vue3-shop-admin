@@ -7,6 +7,7 @@
       <el-button v-if="btns.includes('delete')" type="danger" size="small" @click="$emit('delete')"
         >批量删除</el-button
       >
+      <slot />
     </div>
     <el-button v-if="btns.includes('refresh')" text @click="$emit('refresh')">
       <el-icon :size="20"><Refresh /></el-icon>

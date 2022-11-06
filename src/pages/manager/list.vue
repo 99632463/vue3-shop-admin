@@ -1,24 +1,14 @@
 <template>
   <el-card shadow="never" class="border-0">
-    <el-form :model="searchForm" label-width="80px" class="mb-3">
-      <el-row :gutter="20">
-        <el-col :span="8" :offset="0">
-          <el-form-item label="关键词">
-            <el-input
-              v-model="searchForm.keyword"
-              clearable
-              placeholder="管理员昵称"
-            ></el-input>
-          </el-form-item>
-        </el-col>
-        <el-col :span="8" :offset="8">
-          <div class="flex items-center justify-end">
-            <el-button type="primary" @click="getData">搜索</el-button>
-            <el-button @click="resetSearchForm">重置</el-button>
-          </div>
-        </el-col>
-      </el-row>
-    </el-form>
+    <search :model="searchForm" @search='getData' @reset='resetSearchForm'>
+      <searchItem label="关键词">
+        <el-input
+          v-model="searchForm.keyword"
+          clearable
+          placeholder="管理员昵称"
+        ></el-input>
+      </searchItem>
+    </search>
 
     <!-- 新增/刷新 -->
     <listHeader @create='handleCreate' @refresh='getData'/>
@@ -131,6 +121,8 @@ import formDrawer from "~/components/formDrawer.vue";
 import chooseImage from "~/components/chooseImage.vue";
 import listHeader from "~/components/listHeader.vue";
 import {useInitTable, useInitForm} from '~/composables/useCommon'
+import search from "~/components/search.vue";
+import searchItem from "~/components/searchItem.vue";
 
 const roles = ref([])
 

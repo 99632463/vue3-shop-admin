@@ -91,6 +91,20 @@ export const useInitTable = (opt) => {
       })
   }
 
+  // 批量修改状态
+  const handleMultiStatusChange = (status) => {
+    loading.value = true
+    opt.updateStatus(mutiSelectionIds.value,status)
+      .then(res => {
+        if(tableRef.value){
+          tableRef.value.clearSelection()
+        }
+        getData()
+      }).finally(() => {
+        loading.value = false
+      })
+  }
+
   return {
     searchForm,
     resetSearchForm,
@@ -104,7 +118,8 @@ export const useInitTable = (opt) => {
     handleStatusChange,
     handleSelectionChange,
     tableRef,
-    handleMultiDelete
+    handleMultiDelete,
+    handleMultiStatusChange
   }
 }
 
@@ -153,7 +168,7 @@ export const useInitForm = (opt) => {
     formDrawerRef.value.open();
     editId.value = row.id;
 
-    for (const key in row) {
+    for (const key in defaultFormData) {
       form[key] = row[key]
     }
   };

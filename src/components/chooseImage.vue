@@ -1,6 +1,31 @@
 <template>
   <div v-if="modelValue">
-    <el-image :src="modelValue" fit="cover" class="w-[100px] h-[100px] rounded border mr-2"></el-image>
+    <el-image
+      v-if="typeof modelValue === 'string'"
+      :src="modelValue"
+      fit="cover"
+      class="w-[100px] h-[100px] rounded border mr-2"
+    ></el-image>
+    <div v-else class="flex flex-wrap">
+      <div
+        v-for="(url, index) in modelValue"
+        :key="index"
+        class="relative mx-1 mb-2 w-[100px] h-[100px]"
+      >
+        <el-icon 
+          class="absolute right-[5px] top-[5px] cursor-pointer bg-white rounded-full" 
+          style="z-index: 10"
+          @click="removeImage(url)"
+        >
+          <CircleClose />
+        </el-icon>
+        <el-image
+          :src="url"
+          fit="cover"
+          class="w-[100px] h-[100px] rounded border mr-2"
+        ></el-image>
+      </div>
+    </div>
   </div>
 
   <div class="choose-image-btn" @click="open">
@@ -15,7 +40,7 @@
       </el-header>
       <el-container>
         <image-aside ref="imageAsideRef" @change="handleAsideChange" />
-        <image-main ref="imageMainRef" @choose='handleChoose'/>
+        <image-main :limit="limit" ref="imageMainRef" @choose="handleChoose" />
       </el-container>
     </el-container>
     <template #footer>
@@ -28,31 +53,35 @@
 </template>
 
 <script setup>
-import imageAside from '~/components/imageAside.vue'
-import imageMain from '~/components/imageMain.vue'
-import { ref } from 'vue';
+import imageAside from "~/components/imageAside.vue";
+import imageMain from "~/components/imageMain.vue";
+import { ref } from "vue";
 
-const imageAsideRef = ref(null)
+const imageAsideRef = ref(null);
 const dialogVisible = ref(false);
-const imageMainRef = ref(null)
+const imageMainRef = ref(null);
 
 const handleOpenCreate = () => {
-  imageAsideRef.value.handleCreate()
-}
+  imageAsideRef.value.handleCreate();
+};
 
-const handleAsideChange = id => {
-  imageMainRef.value.loadData(id)
-}
+const handleAsideChange = (id) => {
+  imageMainRef.value.loadData(id);
+};
 
 const props = defineProps({
-  modelValue: [String, Array]
-})
-const emit = defineEmits(['update:modelValue'])
+  modelValue: [String, Array],
+  limit: {
+    type: Number,
+    default: 1
+  }
+});
+const emit = defineEmits(["update:modelValue"]);
 
-let urls = []
+let urls = [];
 const handleChoose = (e) => {
-  urls = e.map(o => o.url)
-}
+  urls = e.map((o) => o.url);
+};
 
 const open = () => {
   dialogVisible.value = true;
@@ -62,18 +91,31 @@ const close = () => {
 };
 
 const submit = () => {
-  if (urls.length) {
-    emit('update:modelValue', urls[0])
+  let value = []
+  if(props.limit == 1){
+    value = urls[0]
+  } else {
+    value = [...props.modelValue, ...urls]
+    if(value.length > props.limit){
+      return alert(`最多还能选择${props.limit - props.modelValue.length}张`)
+    }
   }
-  close()
+  if (value) {
+    emit("update:modelValue", value);
+  }
+  close();
 };
+
+const removeImage = (url) => {
+  emit("update:modelValue", props.modelValue.filter(u => u != url));
+}
 </script>
 
 <style scoped lang="scss">
 .choose-image-btn {
   @apply w-[100px] h-[100px] rounded border flex justify-center items-center cursor-pointer hover:(bg-gray-100);
 }
-.image-header{
+.image-header {
   border-bottom: 1px solid #eeeeee;
   @apply flex items-center;
 }
