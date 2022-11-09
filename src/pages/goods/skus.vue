@@ -41,6 +41,7 @@
       </template>
       <template v-else>
         <skuCard />
+        <skuTable />
       </template>
       <el-form-item>
         <el-button v-loading="loading" type="primary" @click="submit"
@@ -55,7 +56,8 @@
 import { ref, reactive } from "vue";
 import { readGoods, updateGoodsSkus } from "~/api/goods";
 import skuCard from './components/skuCard.vue'
-import {initSkuCardList, goodsId} from '~/composables/useSku'
+import skuTable from './components/skuTable.vue'
+import {initSkuCardList, goodsId, sku_list} from '~/composables/useSku'
 
 const form = reactive({
   sku_type: 0,
@@ -72,7 +74,14 @@ const loading = ref(false);
 
 const submit = () => {
   loading.value = true;
-  updateGoodsSkus(goodsId.value, form)
+  let data = {
+    sku_type: form.sku_type,
+    sku_value: form.sku_value,
+  }
+  if(form.sku_type == 1){
+    data.goodsSkus = sku_list.value
+  }
+  updateGoodsSkus(goodsId.value, data)
     .then((res) => {
       dialogVisiable.value = false;
     })
